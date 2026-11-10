@@ -1,0 +1,67 @@
+# IBM Code Engine — Application Spec
+# Deploy with:  ibmcloud ce application create --from-file ce-application.yaml
+# Update with:  ibmcloud ce application update --from-file ce-application.yaml
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: research-agent
+  annotations:
+    serving.knative.dev/creator: ibmcloud-ce
+spec:
+  template:
+    metadata:
+      annotations:
+        # Scale to 0 when idle (Code Engine serverless billing)
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "5"
+        # Allow long-running LLM calls (up to 5 min)
+        autoscaling.knative.dev/window: "300s"
+    spec:
+      containerConcurrency: 10
+      timeoutSeconds: 300
+      containers:
+        - image: icr.io/YOUR_NAMESPACE/research-agent:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+          env:
+            # Reference Code Engine secrets (set via ibmcloud ce secret create)
+            - name: IBM_WATSONX_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: research-agent-secrets
+                  key: IBM_WATSONX_API_KEY
+            - name: IBM_WATSONX_PROJECT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: research-agent-secrets
+                  key: IBM_WATSONX_PROJECT_ID
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: research-agent-secrets
+                  key: SECRET_KEY
+            # Non-secret config
+            - name: IBM_WATSONX_URL
+              value: "https://us-south.ml.cloud.ibm.com"
+            - name: GRANITE_MODEL_ID
+              value: "meta-llama/llama-3-3-70b-instruct"
+            - name: GRANITE_MAX_TOKENS
+              value: "1024"
+            - name: GRANITE_TEMPERATURE
+              value: "0.7"
+            - name: MAX_PAPERS_PER_QUERY
+              value: "10"
+            - name: OUTPUT_DIR
+              value: "/tmp/outputs"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: PORT
+              value: "8080"

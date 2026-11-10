@@ -1,0 +1,13 @@
+.env
+.env.local
+.env.*.local
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.git
+.gitignore
+tests/
+outputs/
+*.md
+*.log

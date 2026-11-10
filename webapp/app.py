@@ -31,7 +31,9 @@ from flask import (
 )
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
-app.secret_key = os.urandom(32)
+# Use a stable SECRET_KEY env var in production (Code Engine secret) so
+# sessions survive container restarts. Falls back to a random key in dev.
+app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(32)
 
 # ── In-memory job store ───────────────────────────────────────────────────────
 # job_id → {"status", "progress", "result", "error", "queue"}
