@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Researching… — IBM Research Agent{% endblock %}
+
+{% block content %}
+<div class="loading-page">
+  <div class="spinner-large"></div>
+  <h2>Running Research Pipeline</h2>
+  <p class="muted">Query: <strong>{{ query }}</strong></p>
+  <div class="progress-bar-track" style="max-width:500px;margin:1.5rem auto">
+    <div id="progressBar" class="progress-bar-fill" style="width:0%"></div>
+  </div>
+  <p id="progressMessage" class="progress-message">Connecting to IBM watsonx.ai…</p>
+  <p id="progressStepLabel" class="muted small"></p>
+
+  <div id="papersFeed" style="display:none;margin-top:2rem;text-align:left;max-width:700px;margin-left:auto;margin-right:auto">
+    <h3 class="feed-title">📄 Papers Found</h3>
+    <div id="papersTable" class="papers-mini-table"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const JOB_ID = "{{ job_id }}";
+  const es = new EventSource("/stream/" + JOB_ID);
+  const TOTAL_STEPS = 5;
+
+  function setProgress(step, total) {
+    const pct = Math.round((step / total) * 100);
+    document.getElementById("progressBar").style.width = pct + "%";
+    document.getElementById("progressStepLabel").textContent = "Step " + step + " of " + total;
+  }
+
+  es.addEventListener("progress", e => {
+    const d = JSON.parse(e.data);
+    document.getElementById("progressMessage").textContent = d.message;
+    setProgress(d.step, d.total);
+  });
+
+  es.addEventListener("papers_found", e => {
+    const d = JSON.parse(e.data);
+    document.getElementById("papersFeed").style.display = "block";
+    const box = document.getElementById("papersTable");
+    box.innerHTML = d.papers.map((p, i) => `
+      <div class="mini-paper-row">
+        <span class="mini-num">${i+1}</span>
+        <span class="mini-title">${p.title}</span>
+        <span class="mini-year">${p.year || "–"}</span>
+        <span class="mini-source badge-source">${p.source}</span>
+      </div>`).join("");
+  });
+
+  es.addEventListener("done", e => {
+    es.close();
+    window.location.href = "/results/" + JOB_ID;
+  });
+
+  es.addEventListener("error", e => {
+    es.close();
+    const d = JSON.parse(e.data || '{"message":"Unknown error"}');
+    document.getElementById("progressMessage").textContent = "❌ " + d.message;
+    document.getElementById("progressBar").style.background = "var(--danger)";
+  });
+</script>
+{% endblock %}

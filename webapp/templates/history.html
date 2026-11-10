@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Search History — IBM Research Agent{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Search History</h1>
+
+{% if history %}
+<div class="history-list">
+  {% for item in history %}
+  {% set job = jobs.get(item.job_id) %}
+  <div class="card history-card">
+    <div class="history-card-body">
+      <p class="history-query">{{ item.query }}</p>
+      <span class="badge-status badge-{{ job.status if job else 'unknown' }}">
+        {{ job.status if job else 'expired' }}
+      </span>
+    </div>
+    <div class="history-card-actions">
+      {% if job and job.status == 'done' %}
+        <a href="/results/{{ item.job_id }}" class="btn btn-primary btn-sm">View Results</a>
+        <a href="/report/{{ item.job_id }}"  class="btn btn-outline btn-sm">View Report</a>
+      {% elif job and job.status == 'running' %}
+        <a href="/results/{{ item.job_id }}" class="btn btn-outline btn-sm">View Progress</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="empty-icon">🔬</div>
+  <h2>No searches yet</h2>
+  <p>Start your first research query to see results here.</p>
+  <a href="/" class="btn btn-primary">Start Research</a>
+</div>
+{% endif %}
+{% endblock %}

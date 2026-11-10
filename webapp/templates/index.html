@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}IBM Research Agent — Autonomous Academic Research{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-badge">Powered by IBM Granite on IBM Cloud Lite</div>
+  <h1 class="hero-title">IBM Research Agent</h1>
+  <p class="hero-sub">
+    Ask a research question. The agent autonomously searches arXiv, Semantic Scholar &amp; CrossRef,
+    summarises papers with AI, generates hypotheses, and writes a full report — all in one click.
+  </p>
+</section>
+
+<section class="search-card card">
+  <form id="searchForm">
+    <div class="form-group">
+      <label for="queryInput" class="form-label">Research Question or Topic</label>
+      <textarea
+        id="queryInput"
+        name="query"
+        class="form-input textarea"
+        rows="3"
+        placeholder="e.g. transformer models in drug discovery, CRISPR applications in cancer therapy…"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group flex-1">
+        <label class="form-label">Literature Sources</label>
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" name="sources" value="arxiv" checked /> arXiv
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="sources" value="semantic_scholar" checked /> Semantic Scholar
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="sources" value="crossref" checked /> CrossRef
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="hypothesesCount" class="form-label">Hypotheses to Generate</label>
+        <select id="hypothesesCount" name="hypotheses" class="form-input select">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" id="submitBtn" class="btn btn-primary btn-large">
+      <span class="btn-icon">🔬</span> Start Research
+    </button>
+  </form>
+</section>
+
+<!-- Progress Panel (hidden until search starts) -->
+<section id="progressPanel" class="card progress-card" style="display:none">
+  <div class="progress-header">
+    <span class="spinner"></span>
+    <span id="progressMessage" class="progress-message">Starting pipeline…</span>
+  </div>
+  <div class="progress-bar-track">
+    <div id="progressBar" class="progress-bar-fill" style="width:0%"></div>
+  </div>
+  <p class="progress-step-label" id="progressStepLabel"></p>
+
+  <!-- Live papers feed -->
+  <div id="papersFeed" style="display:none">
+    <h3 class="feed-title">📄 Papers Found</h3>
+    <div id="papersTable" class="papers-mini-table"></div>
+  </div>
+</section>
+
+<!-- Feature cards -->
+<section class="features">
+  <div class="feature-card">
+    <div class="feature-icon">📚</div>
+    <h3>Literature Search</h3>
+    <p>Simultaneously queries arXiv, Semantic Scholar, and CrossRef with deduplication.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">🤖</div>
+    <h3>AI Summaries</h3>
+    <p>Each paper is summarised and key findings extracted using IBM Llama-3 on watsonx.ai.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">💡</div>
+    <h3>Hypothesis Generation</h3>
+    <p>Novel, testable hypotheses grounded in the retrieved literature — scored for plausibility.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📝</div>
+    <h3>Full Report</h3>
+    <p>7-section research report with executive summary, literature review, synthesis, and references.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">📎</div>
+    <h3>Citation Export</h3>
+    <p>Download references in BibTeX, APA 7th edition, or JSON with one click.</p>
+  </div>
+  <div class="feature-card">
+    <div class="feature-icon">☁️</div>
+    <h3>IBM Cloud Lite</h3>
+    <p>Runs entirely on IBM Cloud free tier — no credit card required.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}

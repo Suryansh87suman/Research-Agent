@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}IBM Research Agent{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <span class="logo-ibm">IBM</span>
+        <span class="logo-text">Research Agent</span>
+      </a>
+      <nav class="site-nav">
+        <a href="/">New Search</a>
+        <a href="/history">History</a>
+        <a href="https://cloud.ibm.com" target="_blank" rel="noopener">IBM Cloud</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Powered by <strong>IBM Granite / Llama-3</strong> on <strong>IBM Cloud Lite</strong> &nbsp;·&nbsp;
+      IBM Research Agent &copy; 2026
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

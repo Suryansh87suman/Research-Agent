@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Report — IBM Research Agent{% endblock %}
+
+{% block head %}
+<!-- marked.js for client-side Markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="report-header">
+  <h1 class="page-title">📄 Research Report</h1>
+  <p class="query-display">🔬 <strong>{{ query }}</strong></p>
+  <div class="result-actions">
+    <a href="/results/{{ job_id }}" class="btn btn-outline">← Back to Results</a>
+    <a href="/download/{{ job_id }}/report" class="btn btn-primary">⬇ Download (.md)</a>
+    <a href="/download/{{ job_id }}/bibtex" class="btn btn-outline">⬇ BibTeX</a>
+    <a href="/download/{{ job_id }}/apa"    class="btn btn-outline">⬇ APA Refs</a>
+    <button onclick="window.print()" class="btn btn-ghost">🖨 Print</button>
+  </div>
+</div>
+
+<div class="report-body card" id="reportBody">
+  <!-- filled by JS below -->
+  <p class="muted">Rendering report…</p>
+</div>
+
+<!-- Raw Markdown (hidden) -->
+<script id="reportMarkdown" type="text/plain">{{ report_md | e }}</script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const raw = document.getElementById("reportMarkdown").textContent;
+  document.getElementById("reportBody").innerHTML = marked.parse(raw);
+</script>
+{% endblock %}
